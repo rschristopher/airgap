@@ -2,6 +2,8 @@ import argparse
 import binascii
 import curses
 import hashlib
+import os
+import sys
 
 
 D6 = '123456'
@@ -73,5 +75,24 @@ def _prompt(seed_words=SEED_WORDS, digits=D6):
     curses.endwin()
     final_seeds = dice_to_seed_phrase(''.join(rolls), digits, seed_words)
     return ' '.join(final_seeds)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--digits", type=int, default=6, help="increase output verbosity")
+    parser.add_argument("-L", "--language-file", default='english.txt', help="increase output verbosity")
+    args = parser.parse_args()
+    _d = D6
+    if args.digits == 8:
+        _d = D8
+    _sw = []
+    if  os.path.isfile(args.language_file):
+        with open(args.language_file) as f:
+            _sw = f.read().splitlines()
+    else:
+        print('Please specify a valid language file')
+        sys.exit(-1)
+    print(_prompt(seed_words=_sw, digits=_d))
+
 
 
