@@ -91,7 +91,7 @@ if __name__ == '__main__':
         with open(args.language_file) as f:
             _sw = f.read().splitlines()
     else:
-        print('Please specify a valid language file')
+        print('Please specify a valid language file', file=sys.stderr)
         sys.exit(-1)
     print(_prompt(seed_words=_sw, digits=_d))
 
