@@ -17,7 +17,7 @@ with open('english.txt') as f:
 def dice2n(n_str, digits):
     basem = 1
     n = 0
-    for c in reversed(n_str):
+    for c in n_str:
         n += (digits.index(c)) * basem
         basem = basem*len(digits)
     return n
@@ -28,25 +28,22 @@ def n2dice(n, digits):
     while n > 0:
         n, d = divmod(n, len(digits))
         chars.append(digits[d])
-    return ''.join(reversed(chars))
+    return ''.join(chars)
+
+
+def _seed_checksum(s):
+    """return checksum bin from binary input string"""
+    _bytes = int(s, 2).to_bytes(len(s) // 8)
+    _sha = hashlib.sha256(_bytes).hexdigest()
+    return format(int(_sha[0:2], 16), '08b')
 
 
 def dice_to_seed_phrase(n_str, digits, seed_words):
     """ generate seed phrase from dice rolls
     """
-    def dice2n(n_str, digits):
-        basem = 1
-        n = 0
-        for c in reversed(n_str):
-            n += (digits.index(c)) * basem
-            basem = basem*len(digits)
-        return n
     entropy_number = dice2n(n_str, digits)
     entropy_bin = format(entropy_number, '0256b')[:256]
-    entropy_hex = format(entropy_number, '064x')[:64]
-    hex_bytes = binascii.a2b_hex(entropy_hex)
-    entropy_sha = hashlib.sha256(hex_bytes).hexdigest()
-    seed_bin = entropy_bin + format(int(entropy_sha[0:2], 16), '08b')
+    seed_bin = entropy_bin + _seed_checksum(entropy_bin)
     return [seed_words[int(seed_bin[x:x+11],2)] for x in range(0,264,11)]
 
 
@@ -75,7 +72,7 @@ def _prompt(seed_words=SEED_WORDS, digits=D6):
             rolls.append(chr(_raw))
     curses.endwin()
     final_seeds = dice_to_seed_phrase(''.join(rolls), digits, seed_words)
-    return ' '.join(final_seeds)
+    return ''.join(rolls) + '\n' + ' '.join(final_seeds)
 
 
 if __name__ == '__main__':
