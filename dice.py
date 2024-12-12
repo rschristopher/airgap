@@ -71,7 +71,8 @@ def _prompt(seed_words=SEED_WORDS, digits=D6):
             rolls.append(chr(_raw))
     curses.endwin()
     final_seeds = dice_to_seed_phrase(''.join(rolls), digits, seed_words)
-    return ''.join(rolls) + '\n' + ' '.join(final_seeds)
+    bin_ent = bin(dice2n(''.join(rolls), digits))[2:258]
+    return ''.join(rolls) + '\n' + bin_ent + '\n'  + ' '.join(final_seeds)
 
 
 if __name__ == '__main__':
